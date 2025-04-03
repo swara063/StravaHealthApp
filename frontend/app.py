@@ -3,7 +3,7 @@ import requests
 
 # Function to fetch Strava data from the backend
 def fetch_strava_data_from_backend(access_token):
-    url = f"http://localhost:5000/fetch-data?access_token={access_token}"
+    url = f"https://stravahealthapp.streamlit.app/fetch-data?access_token={access_token}"
     response = requests.get(url)
     return response.json()
 
