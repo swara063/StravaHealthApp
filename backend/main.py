@@ -19,7 +19,7 @@ def login():
 # Endpoint to handle the OAuth callback
 @app.route('/callback')
 def callback():
-    code = request.args.get('code')
+    code = request.args.get('code')  # Strava sends the 'code' as a query param
     access_token = get_access_token(code, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
     if access_token:
         return jsonify({'access_token': access_token}), 200
