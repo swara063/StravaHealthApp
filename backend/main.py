@@ -9,7 +9,8 @@ app = Flask(__name__)
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 REDIRECT_URI = os.getenv('REDIRECT_URI')
-
+ACCESS_TOKEN = os.getenv('ACCESS_TOKEN')
+REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')
 # Endpoint to initiate Strava OAuth login
 @app.route('/login')
 def login():
