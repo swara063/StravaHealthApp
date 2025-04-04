@@ -1,5 +1,5 @@
-import requests
 import os
+import requests
 
 # Get the OAuth URL for Strava authentication
 def get_oauth_url(client_id, redirect_uri):
@@ -19,4 +19,5 @@ def get_access_token(code, client_id, client_secret, redirect_uri):
     if response.status_code == 200:
         return response.json()['access_token']
     return None
+
 
