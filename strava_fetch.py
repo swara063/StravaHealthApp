@@ -1,5 +1,6 @@
 import requests
 
+# Fetch activity data from Strava API
 def fetch_strava_data(access_token):
     url = "https://www.strava.com/api/v3/athlete/activities"
     headers = {"Authorization": f"Bearer {access_token}"}
