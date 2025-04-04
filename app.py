@@ -1,9 +1,10 @@
 import streamlit as st
 import requests
+import os
 
 # Function to fetch Strava data from the backend
 def fetch_strava_data_from_backend(access_token):
-    url = f"http://localhost:5000/fetch-data?access_token={access_token}"
+    url = f"{os.getenv('BACKEND_URL')}/fetch-data?access_token={access_token}"
     response = requests.get(url)
     return response.json()
 
@@ -14,7 +15,7 @@ st.title("Strava Health Integration")
 if st.button("Login with Strava"):
     st.write("Redirecting to Strava for authentication...")
     # This will trigger the backend to handle Strava OAuth flow
-    st.experimental_set_query_params(url="http://localhost:5000/login")
+    st.experimental_set_query_params(url=f"{os.getenv('BACKEND_URL')}/login")
 
 # If access token exists in session, allow fetching of data
 if 'access_token' in st.session_state:
