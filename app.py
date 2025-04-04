@@ -15,7 +15,8 @@ st.title("Strava Health Integration")
 if st.button("Login with Strava"):
     st.write("Redirecting to Strava for authentication...")
     # This will trigger the backend to handle Strava OAuth flow
-    st.query_params(url=f"{os.getenv('BACKEND_URL')}/login")
+    st.query_params = {"url": f"{os.getenv('BACKEND_URL')}/login"}
+
 
 # If access token exists in session, allow fetching of data
 if 'access_token' in st.session_state:
