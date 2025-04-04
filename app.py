@@ -1,7 +1,3 @@
-
-python
-Copy
-Edit
 import streamlit as st
 import requests
 
@@ -14,15 +10,17 @@ def fetch_strava_data_from_backend(access_token):
 # Streamlit Interface
 st.title("Strava Health Integration")
 
-# Step 1: Input Access Token
-access_token = st.text_input("Enter your Strava Access Token:")
+# Display login button
+if st.button("Login with Strava"):
+    st.write("Redirecting to Strava for authentication...")
+    # This will trigger the backend to handle Strava OAuth flow
+    st.experimental_set_query_params(url="http://localhost:5000/login")
 
-if access_token:
-    st.session_state['access_token'] = access_token
+# If access token exists in session, allow fetching of data
+if 'access_token' in st.session_state:
     st.success("Access token saved successfully!")
 
-# Step 2: Fetch and display data
-if 'access_token' in st.session_state:
+    # Fetch and display Strava data
     if st.button("Fetch Strava Data"):
         data = fetch_strava_data_from_backend(st.session_state['access_token'])
         if 'error' in data:
@@ -32,3 +30,4 @@ if 'access_token' in st.session_state:
             st.write(f"Distance: {data['distance']} km")
             st.write(f"Heart Rate: {data['heart_rate']}")
             st.write(f"Calories Burned: {data['calories_burned']} kcal")
+
