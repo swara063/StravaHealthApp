@@ -16,7 +16,9 @@ FRONTEND_URL = os.getenv('FRONTEND_URL')
 @app.route('/login')
 def login():
     auth_url = get_oauth_url(CLIENT_ID, REDIRECT_URI)
+    print(f"🔗 Redirecting to: {auth_url}")
     return redirect(auth_url)
+
 
 # OAuth callback
 @app.route('/callback')
