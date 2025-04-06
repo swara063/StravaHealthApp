@@ -36,6 +36,6 @@ def fetch_data():
         return jsonify(data), 200
     return jsonify({'error': 'Access token is required'}), 400
 
-if _name_ == '_main_':
+if __name__ == '_main_':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
