@@ -3,7 +3,7 @@ import os
 from strava_auth import get_oauth_url, get_access_token
 from strava_fetch import fetch_strava_data
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # Environment variables for Strava API
 CLIENT_ID = os.getenv('CLIENT_ID')
