@@ -22,11 +22,14 @@ def login():
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
+    print(f"Received code: {code}")
     access_token = get_access_token(code, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
     if access_token:
-        # ✅ Redirect back to Streamlit with token
+        print(f"Access token obtained: {access_token}")
         return redirect(f"{FRONTEND_URL}?access_token={access_token}")
+    print("Failed to fetch access token")
     return jsonify({'error': 'Failed to fetch access token'}), 400
+
 
 # Fetch Strava data
 @app.route('/fetch-data')
