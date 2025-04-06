@@ -40,6 +40,27 @@ def fetch_data():
         return jsonify(data), 200
     return jsonify({'error': 'Access token is required'}), 400
 
+import sys
+import traceback
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    print(f"🔥 Caught exception: {e}")
+    traceback.print_exc(file=sys.stdout)
+    return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
+    import time
+    import threading
+
+    def keep_alive():
+        while True:
+            print("✅ Flask app is alive")
+            time.sleep(10)
+
+    threading.Thread(target=keep_alive, daemon=True).start()
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+    
 
