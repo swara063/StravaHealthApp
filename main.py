@@ -22,6 +22,7 @@ def login():
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
+    print(f"🪝 Callback received! Code: {code}")
     print(f"Received code: {code}")
     access_token = get_access_token(code, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
     if access_token:
