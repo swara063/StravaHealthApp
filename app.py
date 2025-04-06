@@ -9,7 +9,7 @@ BACKEND_URL = os.getenv('BACKEND_URL')
 st.title("🚴‍♂️ Strava Health Integration")
 
 # Check for access token in URL query params and save to session
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 if 'access_token' in query_params:
     st.session_state['access_token'] = query_params['access_token'][0]
     st.success("Access token received successfully!")
