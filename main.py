@@ -6,10 +6,9 @@ from strava_fetch import fetch_strava_data
 app = Flask(__name__)
 
 # Environment variables for Strava API
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-REDIRECT_URI = os.getenv('REDIRECT_URI')
-FRONTEND_URL = os.getenv('FRONTEND_URL')
+CLIENT_ID = os.getenv('STRAVA_CLIENT_ID')
+CLIENT_SECRET = os.getenv('STRAVA_CLIENT_SECRET')
+REDIRECT_URI = os.getenv('STRAVA_REDIRECT_URI')
 
 # Start Strava OAuth
 @app.route('/login')
