@@ -1,18 +1,21 @@
 import requests
 
-# Fetch activity data from Strava API
 def fetch_strava_data(access_token):
     url = "https://www.strava.com/api/v3/athlete/activities"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    params = {"per_page": 1, "page": 1}  # Fetch the most recent activity
+    headers = {'Authorization': f'Bearer {access_token}'}
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        activities = response.json()
 
-    response = requests.get(url, headers=headers, params=params)
-    if response.status_code == 200:
-        activity = response.json()[0]
-        data = {
-            'distance': activity['distance'] / 1000,  # Convert meters to kilometers
-            'heart_rate': activity.get('average_heartrate', 'N/A'),
-            'calories_burned': activity.get('calories', 'N/A')
+        if not activities:
+            return {'error': 'No activities found'}
+
+        latest_activity = activities[0]
+        return {
+            'distance': latest_activity.get('distance', 0) / 1000,  # meters to km
+            'heart_rate': latest_activity.get('average_heartrate', 'N/A'),
+            'calories_burned': latest_activity.get('kilojoules', 'N/A')
         }
-        return data
-    return {'error': 'Failed to fetch data'}
+    except requests.RequestException as e:
+        return {'error': str(e)}
