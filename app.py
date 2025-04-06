@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import os
+import streamlit.components.v1 as components
 
 # Function to fetch Strava data from the backend
 def fetch_strava_data_from_backend(access_token):
