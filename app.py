@@ -5,7 +5,7 @@ import os
 # Function to fetch Strava data from the backend
 def fetch_strava_data_from_backend(access_token):
     url = f"{os.getenv('BACKEND_URL')}/fetch-data?access_token={access_token}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     return response.json()
 
 # Streamlit Interface
