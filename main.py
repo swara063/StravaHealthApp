@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, redirect
 import os
 from strava_auth import get_oauth_url, get_access_token, refresh_access_token
 from strava_fetch import fetch_strava_data
+print("✅ Imports successful, proceeding to app setup...")
+
 
 import sys
 
