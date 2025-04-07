@@ -4,17 +4,17 @@ import os
 import time
 
 # Environment variable for backend URL
-BACKEND_URL = os.getenv('BACKEND_URL')
+BACKEND_URL = os.getenv('BACKEND_URL', 'https://stravahealthapp-production.up.railway.app')
 
 st.title("🚴‍♂️ Strava Health Integration")
 
-# Check for access token in URL query params and save to session
+# Step 1: Check for access token in URL query params and save to session
 query_params = st.query_params
 if 'access_token' in query_params:
     st.session_state['access_token'] = query_params['access_token'][0]
-    st.success("Access token received successfully!")
-    
-    # ✅ CLEAN UP URL to stop infinite loop
+    st.success("✅ Access token received!")
+
+    # Clean URL to prevent infinite loop
     js = """
     <script>
         const newUrl = window.location.origin + window.location.pathname;
@@ -23,40 +23,44 @@ if 'access_token' in query_params:
     """
     st.components.v1.html(js)
 
+    # Optional: trigger rerun to continue flow automatically
+    st.experimental_rerun()
 
-# Login button
+# Step 2: If no token, show login button
 if 'access_token' not in st.session_state:
-    if st.button("Login with Strava"):
-        st.write("Redirecting to Strava for authentication...")
+    if st.button("Login with Strava 🚴‍♀️"):
         auth_url = f"{BACKEND_URL}/login"
-        js = f"window.open('{auth_url}')"  # Open in new tab
+        js = f"window.open('{auth_url}', '_self')"  # Open in same tab
         st.components.v1.html(f"<script>{js}</script>")
 else:
-    st.success("You are logged in!")
+    st.success("🎉 You are logged in!")
 
-    if st.button("Fetch Strava Data"):
-        with st.spinner("Fetching your Strava data..."):
-            try:
-                url = f"{BACKEND_URL}/fetch-data?access_token={st.session_state['access_token']}"
-                response = requests.get(url, timeout=10)
-                data = response.json()
-            except requests.RequestException as e:
-                st.error(f"Request failed: {e}")
-                st.stop()
+    # Auto-fetch data immediately when access_token exists
+    with st.spinner("Fetching your Strava data..."):
+        try:
+            url = f"{BACKEND_URL}/fetch-data?access_token={st.session_state['access_token']}"
+            response = requests.get(url, timeout=10)
+            data = response.json()
+        except requests.RequestException as e:
+            st.error(f"Request failed: {e}")
+            st.stop()
 
-            # Progress bar
-            progress = st.progress(0)
-            for percent_complete in range(100):
-                time.sleep(0.01)
-                progress.progress(percent_complete + 1)
-            progress.empty()
+        # Progress bar (faster)
+        progress = st.progress(0)
+        for percent_complete in range(0, 101, 10):
+            time.sleep(0.05)
+            progress.progress(percent_complete)
+        progress.empty()
 
-            # Display data
-            if 'error' in data:
-                st.error(data['error'])
-            else:
-                st.subheader("Activity Data:")
-                st.write(f"🏃 Distance: {data.get('distance', 0)} km")
-                st.write(f"❤️ Heart Rate: {data.get('heart_rate', 'N/A')}")
-                st.write(f"🔥 Calories Burned: {data.get('calories_burned', 'N/A')} kcal")
+        # Display data
+        if 'error' in data:
+            st.error(data['error'])
+        else:
+            st.subheader("🏃 Your Activity Data:")
+            st.write(f"🏞️ Distance: {data.get('distance', 0)} km")
+            st.write(f"🔥 Total Energy: {data.get('energy', 0)} kJ")
+            st.write(f"🕒 Moving Time: {data.get('moving_time', 0)} seconds")
+            st.write(f"💓 Average Heart Rate: {data.get('average_heartrate', 'N/A')} bpm")
+
+            st.success("🚴 Data fetched successfully!")
 
