@@ -4,6 +4,10 @@ from strava_auth import get_oauth_url, get_access_token, refresh_access_token
 from strava_fetch import fetch_strava_data
 print("✅ Imports successful, proceeding to app setup...")
 
+@app.route('/')
+def home():
+    return '🚂 Server is running. Try /login to start authentication.'
+
 
 import sys
 
@@ -74,7 +78,7 @@ def handle_exception(e):
     traceback.print_exc(file=sys.stdout)
     return jsonify({"error": str(e)}), 500
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.getenv("PORT", 8000)), debug=True)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
 
