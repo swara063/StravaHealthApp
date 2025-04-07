@@ -18,14 +18,18 @@ def fetch_strava_data(access_token):
             return {'error': 'No activities found'}
 
         latest_activity = activities[0]
+        print(f"📊 Activities data: {activities}")
+
 
         return {
             'distance': latest_activity.get('distance', 0) / 1000,  # meters to km
             'heart_rate': latest_activity.get('average_heartrate', 'N/A'),
             'calories_burned': latest_activity.get('kilojoules', 'N/A')
+            
         }
 
     except requests.RequestException as e:
         print(f"❌ RequestException: {e}")
         return {'error': str(e)}
+
 
