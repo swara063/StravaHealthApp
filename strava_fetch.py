@@ -11,9 +11,11 @@ def fetch_strava_data(access_token):
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         data = response.json()
-        st.write("Fetched activities:", data)
-        return data
+        st.write("✅ Data fetched successfully")
+        st.json(data)
     except Exception as e:
-        st.error(f"Error fetching activities: {e}")
-        return None
+        st.write(f"❌ Error fetching Strava data: {e}")
+        data = None
+
+    return data
 
