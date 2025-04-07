@@ -18,6 +18,11 @@ def home():
 def flush():
     sys.stdout.flush()
     sys.stderr.flush()
+    
+@app.route('/health')
+def health():
+    return '✅ Healthy', 200
+
 
 print("🚀 App is starting...")
 flush()
