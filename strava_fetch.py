@@ -1,4 +1,6 @@
 import requests
+st.write(f"Using access token: {st.session_state['access_token']}")
+
 
 def fetch_strava_data(access_token):
     print(f"🔑 Using access token: {access_token}")  # Debug print
