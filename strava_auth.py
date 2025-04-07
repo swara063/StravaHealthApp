@@ -7,9 +7,8 @@ def get_oauth_url(client_id, redirect_uri):
         f"&approval_prompt=force&scope=read,activity:read"
     )
 
-def get_access_token(code, client_id, client_secret, redirect_uri):
-    print(f"📡 Starting token exchange with code: {code}")
-
+def exchange_code_for_token(code, client_id, client_secret, redirect_uri):
+    print(f"📡 Exchanging code for token: {code}")
     token_url = "https://www.strava.com/oauth/token"
     payload = {
         'client_id': client_id,
@@ -19,21 +18,23 @@ def get_access_token(code, client_id, client_secret, redirect_uri):
         'redirect_uri': redirect_uri
     }
 
-    print(f"📦 Payload for token request: {payload}")
+    response = requests.post(token_url, data=payload, timeout=10)
+    print(f"🧩 Token response: {response.status_code} - {response.text}")
+    response.raise_for_status()
+    return response.json()  # Includes access_token, refresh_token, expires_at
 
-    try:
-        response = requests.post(token_url, data=payload, timeout=10)
-        print(f"🧩 Token response status: {response.status_code}")
-        print(f"🧩 Token response body: {response.text}")
+def refresh_access_token(refresh_token, client_id, client_secret):
+    print(f"🔄 Refreshing access token with refresh token: {refresh_token}")
+    token_url = "https://www.strava.com/oauth/token"
+    payload = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token
+    }
 
-        response.raise_for_status()  # Raises error for 4xx/5xx responses
-
-        access_token = response.json().get('access_token')
-        if not access_token:
-            print("❌ No access token found in response")
-        return access_token
-
-    except Exception as e:
-        print(f"❌ Error fetching access token: {e}")
-        return None
+    response = requests.post(token_url, data=payload, timeout=10)
+    print(f"🔄 Refresh token response: {response.status_code} - {response.text}")
+    response.raise_for_status()
+    return response.json()  # New access_token and refresh_token
 
