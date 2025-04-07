@@ -19,12 +19,11 @@ if 'access_token' in query_params:
     <script>
         const newUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
+        window.location.reload();
     </script>
     """
     st.components.v1.html(js)
 
-    # Optional: trigger rerun to continue flow automatically
-    st.experimental_rerun()
 
 # Step 2: If no token, show login button
 if 'access_token' not in st.session_state:
