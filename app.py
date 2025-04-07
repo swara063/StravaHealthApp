@@ -30,8 +30,9 @@ if 'access_token' in query_params:
 if 'access_token' not in st.session_state:
     if st.button("Login with Strava 🚴‍♀️"):
         auth_url = f"{BACKEND_URL}/login"
-        js = f"window.location.href = '{auth_url}';"  # Redirect in same tab
+        js = f"window.open('{auth_url}', '_blank', 'width=800,height=800');"
         st.components.v1.html(f"<script>{js}</script>")
+
 
 else:
     st.success("🎉 You are logged in!")
