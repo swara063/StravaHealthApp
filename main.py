@@ -4,6 +4,8 @@ from strava_auth import get_oauth_url, get_access_token, refresh_access_token
 from strava_fetch import fetch_strava_data
 print("✅ Imports successful, proceeding to app setup...")
 
+app = Flask(__name__)
+
 @app.route('/')
 def home():
     return '🚂 Server is running. Try /login to start authentication.'
@@ -17,9 +19,6 @@ def flush():
 
 print("🚀 App is starting...")
 flush()
-
-
-app = Flask(__name__)
 
 CLIENT_ID = os.getenv('STRAVA_CLIENT_ID')
 CLIENT_SECRET = os.getenv('STRAVA_CLIENT_SECRET')
