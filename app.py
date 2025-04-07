@@ -1,9 +1,8 @@
 import streamlit as st
 import requests
 import os
-import time
 
-# Environment variable for backend URL
+# Backend URL of your Flask app
 BACKEND_URL = os.getenv('BACKEND_URL', 'https://stravahealthapp-production.up.railway.app')
 
 st.title("🚴‍♂️ Strava Health Integration")
@@ -24,44 +23,54 @@ if 'access_token' in query_params:
     """
     st.components.v1.html(js)
 
-
 # Step 2: If no token, show login button
 if 'access_token' not in st.session_state:
     if st.button("Login with Strava 🚴‍♀️"):
         auth_url = f"{BACKEND_URL}/login"
-        js = f"window.open('{auth_url}', '_blank', 'width=800,height=800');"
+        js = f"window.location.href = '{auth_url}';"
         st.components.v1.html(f"<script>{js}</script>")
-
-
 else:
     st.success("🎉 You are logged in!")
 
-    # Auto-fetch data immediately when access_token exists
-    with st.spinner("Fetching your Strava data..."):
+    # Fetch Strava data function
+    def fetch_strava_data(access_token):
+        st.write(f"🔑 Using access token: {access_token}")
+
+        url = "https://www.strava.com/api/v3/athlete/activities"
+        headers = {'Authorization': f'Bearer {access_token}'}
+
         try:
-            url = f"{BACKEND_URL}/fetch-data?access_token={st.session_state['access_token']}"
-            response = requests.get(url, timeout=10)
-            data = response.json()
+            response = requests.get(url, headers=headers, timeout=10)
+            st.write(f"🌐 Strava response: {response.status_code} - {response.text}")
+
+            response.raise_for_status()
+
+            activities = response.json()
+
+            if not activities:
+                return {'error': 'No activities found'}
+
+            latest_activity = activities[0]
+
+            return {
+                'distance': latest_activity.get('distance', 0) / 1000,  # meters to km
+                'heart_rate': latest_activity.get('average_heartrate', 'N/A'),
+                'calories_burned': latest_activity.get('kilojoules', 'N/A')
+            }
+
         except requests.RequestException as e:
-            st.error(f"Request failed: {e}")
-            st.stop()
+            st.error(f"❌ Error fetching Strava data: {e}")
+            return {'error': str(e)}
 
-        # Progress bar (faster)
-        progress = st.progress(0)
-        for percent_complete in range(0, 101, 10):
-            time.sleep(0.05)
-            progress.progress(percent_complete)
-        progress.empty()
+    # Auto-fetch data immediately
+    with st.spinner("Fetching your Strava data..."):
+        data = fetch_strava_data(st.session_state['access_token'])
 
-        # Display data
         if 'error' in data:
             st.error(data['error'])
         else:
-            st.subheader("🏃 Your Activity Data:")
-            st.write(f"🏞️ Distance: {data.get('distance', 0)} km")
-            st.write(f"🔥 Total Energy: {data.get('energy', 0)} kJ")
-            st.write(f"🕒 Moving Time: {data.get('moving_time', 0)} seconds")
-            st.write(f"💓 Average Heart Rate: {data.get('average_heartrate', 'N/A')} bpm")
-
-            st.success("🚴 Data fetched successfully!")
+            st.subheader("🏃 Latest Activity Data")
+            st.write(f"**Distance:** {data['distance']} km")
+            st.write(f"**Average Heart Rate:** {data['heart_rate']} bpm")
+            st.write(f"**Calories Burned:** {data['calories_burned']} kJ")
 
