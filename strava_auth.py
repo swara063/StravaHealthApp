@@ -7,8 +7,9 @@ def get_oauth_url(client_id, redirect_uri):
         f"&approval_prompt=force&scope=read,activity:read"
     )
 
-def exchange_code_for_token(code, client_id, client_secret, redirect_uri):
-    print(f"📡 Exchanging code for token: {code}")
+def get_access_token(code, client_id, client_secret, redirect_uri):
+    print(f"📡 Starting token exchange with code: {code}")
+
     token_url = "https://www.strava.com/oauth/token"
     payload = {
         'client_id': client_id,
@@ -18,13 +19,19 @@ def exchange_code_for_token(code, client_id, client_secret, redirect_uri):
         'redirect_uri': redirect_uri
     }
 
-    response = requests.post(token_url, data=payload, timeout=10)
-    print(f"🧩 Token response: {response.status_code} - {response.text}")
-    response.raise_for_status()
-    return response.json()  # Includes access_token, refresh_token, expires_at
+    try:
+        response = requests.post(token_url, data=payload, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        print(f"✅ Token data: {data}")
+        return data  # Return full token data: access_token, refresh_token, expires_at
+
+    except Exception as e:
+        print(f"❌ Error fetching access token: {e}")
+        return None
 
 def refresh_access_token(refresh_token, client_id, client_secret):
-    print(f"🔄 Refreshing access token with refresh token: {refresh_token}")
+    print(f"🔄 Refreshing access token using refresh_token: {refresh_token}")
     token_url = "https://www.strava.com/oauth/token"
     payload = {
         'client_id': client_id,
@@ -33,8 +40,15 @@ def refresh_access_token(refresh_token, client_id, client_secret):
         'refresh_token': refresh_token
     }
 
-    response = requests.post(token_url, data=payload, timeout=10)
-    print(f"🔄 Refresh token response: {response.status_code} - {response.text}")
-    response.raise_for_status()
-    return response.json()  # New access_token and refresh_token
+    try:
+        response = requests.post(token_url, data=payload, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        print(f"✅ Refreshed token data: {data}")
+        return data
+
+    except Exception as e:
+        print(f"❌ Error refreshing access token: {e}")
+        return None
+
 
