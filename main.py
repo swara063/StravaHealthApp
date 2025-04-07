@@ -3,6 +3,16 @@ import os
 from strava_auth import get_oauth_url, get_access_token, refresh_access_token
 from strava_fetch import fetch_strava_data
 
+import sys
+
+def flush():
+    sys.stdout.flush()
+    sys.stderr.flush()
+
+print("🚀 App is starting...")
+flush()
+
+
 app = Flask(__name__)
 
 CLIENT_ID = os.getenv('STRAVA_CLIENT_ID')
