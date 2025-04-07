@@ -13,6 +13,16 @@ query_params = st.query_params
 if 'access_token' in query_params:
     st.session_state['access_token'] = query_params['access_token'][0]
     st.success("Access token received successfully!")
+    
+    # ✅ CLEAN UP URL to stop infinite loop
+    js = """
+    <script>
+        const newUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    </script>
+    """
+    st.components.v1.html(js)
+
 
 # Login button
 if 'access_token' not in st.session_state:
