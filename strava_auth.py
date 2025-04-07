@@ -7,10 +7,9 @@ def get_oauth_url(client_id, redirect_uri):
         f"&approval_prompt=force&scope=read,activity:read"
     )
 
-import requests
-
 def get_access_token(code, client_id, client_secret, redirect_uri):
     print(f"📡 Starting token exchange with code: {code}")
+
     token_url = "https://www.strava.com/oauth/token"
     payload = {
         'client_id': client_id,
@@ -19,16 +18,22 @@ def get_access_token(code, client_id, client_secret, redirect_uri):
         'grant_type': 'authorization_code',
         'redirect_uri': redirect_uri
     }
+
     print(f"📦 Payload for token request: {payload}")
 
     try:
-        response = requests.post(token_url, data=payload, timeout=10)  # ⏰ Add timeout!
+        response = requests.post(token_url, data=payload, timeout=10)
         print(f"🧩 Token response status: {response.status_code}")
         print(f"🧩 Token response body: {response.text}")
-        response.raise_for_status()  # raises an error if not 200
-        return response.json().get('access_token')
+
+        response.raise_for_status()  # Raises error for 4xx/5xx responses
+
+        access_token = response.json().get('access_token')
+        if not access_token:
+            print("❌ No access token found in response")
+        return access_token
+
     except Exception as e:
         print(f"❌ Error fetching access token: {e}")
         return None
-
 
