@@ -33,6 +33,24 @@ CLIENT_SECRET = os.getenv('STRAVA_CLIENT_SECRET')
 REDIRECT_URI = os.getenv('STRAVA_REDIRECT_URI')
 FRONTEND_URL = os.getenv('FRONTEND_URL')
 
+@app.route('/refresh')
+def refresh():
+    refresh_token = os.getenv('REFRESH_TOKEN')
+    if not refresh_token:
+        return jsonify({'error': 'No refresh token found in environment'}), 400
+
+    token_data = refresh_access_token(
+        refresh_token,
+        CLIENT_ID,
+        CLIENT_SECRET
+    )
+
+    if token_data and token_data.get('access_token'):
+        return jsonify(token_data), 200
+    else:
+        return jsonify({'error': 'Failed to refresh token'}), 500
+
+
 
 # Route: Start OAuth process
 @app.route('/login')
