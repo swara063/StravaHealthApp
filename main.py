@@ -4,6 +4,7 @@ from strava_auth import get_oauth_url, get_access_token, refresh_access_token
 from strava_fetch import fetch_strava_data
 import sys
 import time
+import requests
 
 print("✅ Imports successful, proceeding to app setup...")
 
