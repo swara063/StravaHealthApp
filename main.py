@@ -32,7 +32,7 @@ CLIENT_ID = os.getenv('CLIENT_ID') or os.getenv('STRAVA_CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET') or os.getenv('STRAVA_CLIENT_SECRET')
 REDIRECT_URI = os.getenv('REDIRECT_URI') or os.getenv('STRAVA_REDIRECT_URI')
 FRONTEND_URL = os.getenv('FRONTEND_URL')
-REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')
+REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')or os.getenv('STRAVA_REFRESH_TOKEN')
 
 @app.route('/refresh')
 def refresh():
