@@ -7,7 +7,44 @@ from datetime import datetime, timedelta
 # Env variable for backend URL
 BACKEND_URL = os.getenv('BACKEND_URL', 'https://stravahealthapp-production.up.railway.app')
 
+# --- Token Refresh Function ---
+def refresh_strava_token():
+    client_id = os.getenv('STRAVA_CLIENT_ID')
+    client_secret = os.getenv('STRAVA_CLIENT_SECRET')
+    refresh_token = os.getenv('STRAVA_REFRESH_TOKEN')
+
+    response = requests.post(
+        url='https://www.strava.com/oauth/token',
+        data={
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token
+        }
+    )
+
+    if response.status_code != 200:
+        st.error(f"Failed to refresh token: {response.text}")
+        return None
+
+    new_tokens = response.json()
+
+    st.success("Token refreshed successfully!")
+    st.write("New Access Token:", new_tokens['access_token'])
+    st.write("New Refresh Token:", new_tokens['refresh_token'])
+
+    return new_tokens
+
+
 st.set_page_config(page_title="Strava Health Dashboard 🚴‍♂️", layout="wide")
+
+# --- Refresh tokens on app start ---
+tokens = refresh_strava_token()
+if tokens:
+    access_token = tokens['access_token']
+else:
+    st.stop()  # Stop the app if token refresh fails
+
 
 # --- STYLES ---
 st.markdown("""
