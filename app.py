@@ -3,6 +3,16 @@ import requests
 import os
 import time
 from datetime import datetime, timedelta
+import requests
+
+def refresh_token():
+    BACKEND_URL = "https://stravahealthapp-production.up.railway.app"
+    response = requests.get(f"{BACKEND_URL}/refresh")
+    return response.json()
+
+token_data = refresh_token()
+print(token_data)
+
 
 # Env variable for backend URL
 BACKEND_URL = os.getenv('BACKEND_URL', 'https://stravahealthapp-production.up.railway.app')
