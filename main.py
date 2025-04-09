@@ -33,6 +33,8 @@ CLIENT_SECRET = os.getenv('CLIENT_SECRET') or os.getenv('STRAVA_CLIENT_SECRET')
 REDIRECT_URI = os.getenv('REDIRECT_URI') or os.getenv('STRAVA_REDIRECT_URI')
 FRONTEND_URL = os.getenv('FRONTEND_URL')
 REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')or os.getenv('STRAVA_REFRESH_TOKEN')
+BACKEND_URL = "https://stravahealthapp-production.up.railway.app"
+response = requests.get(f"{BACKEND_URL}/refresh")
 
 @app.route('/refresh')
 def refresh():
