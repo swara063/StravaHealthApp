@@ -36,7 +36,12 @@ REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')or os.getenv('STRAVA_REFRESH_TOKEN')
 
 @app.route('/refresh')
 def refresh():
-    refresh_token = os.getenv('REFRESH_TOKEN')
+    print(f"🌟 CLIENT_ID: {CLIENT_ID}")
+    print(f"🌟 CLIENT_SECRET: {CLIENT_SECRET}")
+    print(f"🌟 REFRESH_TOKEN: {REFRESH_TOKEN}")
+    flush()
+
+    refresh_token = REFRESH_TOKEN
     if not refresh_token:
         return jsonify({'error': 'No refresh token found in environment'}), 400
 
@@ -50,6 +55,7 @@ def refresh():
         return jsonify(token_data), 200
     else:
         return jsonify({'error': 'Failed to refresh token'}), 500
+
 
 # Route: Start OAuth process
 @app.route('/login')
