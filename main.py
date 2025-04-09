@@ -3,35 +3,36 @@ import os
 from strava_auth import get_oauth_url, get_access_token, refresh_access_token
 from strava_fetch import fetch_strava_data
 import sys
+import time
 
 print("✅ Imports successful, proceeding to app setup...")
 
 # Initialize Flask app
 app = Flask(__name__)
 
+# Flush logs immediately
+def flush():
+    sys.stdout.flush()
+    sys.stderr.flush()
+
 # Home route for sanity check
 @app.route('/')
 def home():
     return '🚂 Server is running. Try /login to start authentication.'
 
-# Flush logs immediately
-def flush():
-    sys.stdout.flush()
-    sys.stderr.flush()
-    
 @app.route('/health')
 def health():
     return '✅ Healthy', 200
-
 
 print("🚀 App is starting...")
 flush()
 
 # Environment variables
-CLIENT_ID = os.getenv('STRAVA_CLIENT_ID')
-CLIENT_SECRET = os.getenv('STRAVA_CLIENT_SECRET')
-REDIRECT_URI = os.getenv('STRAVA_REDIRECT_URI')
+CLIENT_ID = os.getenv('CLIENT_ID') or os.getenv('STRAVA_CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET') or os.getenv('STRAVA_CLIENT_SECRET')
+REDIRECT_URI = os.getenv('REDIRECT_URI') or os.getenv('STRAVA_REDIRECT_URI')
 FRONTEND_URL = os.getenv('FRONTEND_URL')
+REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')
 
 @app.route('/refresh')
 def refresh():
@@ -50,8 +51,6 @@ def refresh():
     else:
         return jsonify({'error': 'Failed to refresh token'}), 500
 
-
-
 # Route: Start OAuth process
 @app.route('/login')
 def login():
@@ -60,7 +59,6 @@ def login():
     flush()
     return redirect(auth_url)
 
-
 # Route: OAuth callback
 @app.route('/callback')
 def callback():
@@ -68,43 +66,69 @@ def callback():
     print(f"🪝 Callback received! Code: {code}")
     flush()
 
+    if not code:
+        return jsonify({'error': 'No code parameter in callback'}), 400
+
     token_data = get_access_token(code, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
-    if token_data and token_data.get('access_token'):
-        params = (
-            f"?access_token={token_data['access_token']}"
-            f"&refresh_token={token_data['refresh_token']}"
-            f"&expires_at={token_data['expires_at']}"
-        )
-        return redirect(f"{FRONTEND_URL}{params}")
 
-    return jsonify({'error': 'Failed to fetch access token'}), 400
+    if not token_data:
+        return jsonify({'error': 'Failed to retrieve token data'}), 500
 
+    access_token = token_data.get('access_token')
+    refresh_token = token_data.get('refresh_token')
 
-# Route: Fetch Strava data
-@app.route('/fetch-data')
-def fetch_data():
-    access_token = request.args.get('access_token')
-    if access_token:
-        data = fetch_strava_data(access_token)
-        return jsonify(data), 200
-    return jsonify({'error': 'Access token is required'}), 400
+    if not access_token:
+        return jsonify({'error': 'No access token found'}), 500
 
+    # Fetch athlete data
+    athlete_data = fetch_strava_data(access_token)
 
-# Route: Refresh token
-@app.route('/refresh-token')
-def refresh_token():
-    refresh_token = request.args.get('refresh_token')
-    if refresh_token:
-        new_tokens = refresh_access_token(refresh_token, CLIENT_ID, CLIENT_SECRET)
-        return jsonify(new_tokens), 200
-    return jsonify({'error': 'Refresh token is required'}), 400
+    if athlete_data is None:
+        return jsonify({'error': 'Failed to fetch athlete data'}), 500
 
+    # Optionally, redirect to frontend with token info
+    if FRONTEND_URL:
+        redirect_url = f"{FRONTEND_URL}?access_token={access_token}&refresh_token={refresh_token}"
+        print(f"➡️ Redirecting to frontend: {redirect_url}")
+        flush()
+        return redirect(redirect_url)
 
-# Start the server
+    return jsonify({
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'athlete_data': athlete_data
+    })
+
+# Optional: Background token refresh loop
+def background_token_refresher():
+    while True:
+        try:
+            print("🔄 Background token refresher running...")
+            flush()
+            if REFRESH_TOKEN:
+                token_data = refresh_access_token(
+                    REFRESH_TOKEN,
+                    CLIENT_ID,
+                    CLIENT_SECRET
+                )
+                if token_data and token_data.get('access_token'):
+                    print("✅ Token refreshed successfully in background.")
+                    flush()
+                else:
+                    print("⚠️ Failed to refresh token in background.")
+                    flush()
+            time.sleep(3600)  # Sleep for 1 hour
+        except Exception as e:
+            print(f"❌ Exception in background refresher: {e}")
+            flush()
+            time.sleep(3600)
+
+# Start the background refresher in a separate thread if you want
+import threading
+threading.Thread(target=background_token_refresher, daemon=True).start()
+
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port, debug=True)
-     while True:
-        time.sleep(10)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+
 
 
